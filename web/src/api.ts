@@ -39,3 +39,6 @@ export const drift = (k: DriftKnobs) => post('/api/drift', k).then(r => ok<Drift
 export const gate = (version: string, expressions: string[]) => post('/api/gate', { version, expressions }).then(r => ok<GateResult>(r));
 export const getCard = (version: string) => fetch(`/api/card?version=${version}`).then(r => ok<{ markdown: string }>(r));
 export const getShip = () => fetch('/api/ship').then(r => ok<ShipResult>(r));
+
+export const bare = (record: Record<string, unknown>) =>
+  post('/api/bare', { record }).then(r => ok<{ ok: boolean; prediction?: string; error?: string }>(r));

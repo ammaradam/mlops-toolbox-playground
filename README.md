@@ -2,17 +2,26 @@
 
 Register a model once, then watch its contract drive typed serving, batch scoring, drift checks, CI gates, model cards and shipping. It runs the real [mlops-toolbox](https://github.com/ammaradam/MLOps-Toolbox) library, so what you see is what the library does.
 
-## What you can try
+## The idea in one minute
 
-| Feature | What to do | Library code behind it |
-|---|---|---|
-| **Register** | Run the pipeline and watch the contract appear: schema, category sets, ranges, metrics, drift baseline | `ClassificationEvaluator`, `infer_contract`, `register_model` |
-| **Typed serving** | Send a valid request, then a wrong type, an unknown category, a missing field | the toolbox's own `FastAPIModelServer`, the one `mt serve` runs |
-| **Batch scoring** | Score a CSV; break it and see it rejected, next to what the bare model would have done | `score_dataframe`, `validate_against_contract` |
-| **Drift** | Move incomes, loan sizes and the customer mix; watch each column and the predictions react | baseline reference data and predictions stored at registration |
-| **CI gate** | Gate v1 and a weaker v2 candidate; try a typo; see the exit code and the pull-request check | `check_gates`, the output of `mt gate` |
-| **Model card** | Read the card written from the registry, rendered or as Markdown | `generate_model_card` |
-| **Ship** | Browse the files `mt ship` writes | the toolbox's own `mt ship` templates |
+A trained model is just a file. Nothing records what inputs it accepts, how well it scored, or what normal data looks like. So bad requests get answered anyway, a drifting model goes unnoticed, and a worse model can slip into production.
+
+`mlops-toolbox` stores a **contract** with the model when you register it: its inputs, scores and a baseline of normal data. Every later step reads that contract instead of being configured again.
+
+## The walkthrough
+
+Six steps, one screen each. Every step states the problem, what the toolbox does, which part of the contract it reads, and shows the same situation **without** and **with** the toolbox.
+
+| Step | Contract part | Try this | Library code behind it |
+|---|---|---|---|
+| 1. Register | all of it | Run the pipeline and watch the contract appear | `ClassificationEvaluator`, `infer_contract`, `register_model` |
+| 2. Serve | inputs | Send a valid request, then a wrong type, an unknown value, a missing field | the toolbox's own `FastAPIModelServer`, the one `mt serve` runs |
+| 3. Score | inputs | Score a CSV, then break it | `score_dataframe`, `validate_against_contract` |
+| 4. Watch | baseline | Shift incomes, loan sizes and the customer mix | reference data and predictions stored at registration |
+| 5. Gate | scores | Gate a strong v1 and a weaker v2; try a typo | `check_gates`, the output of `mt gate` |
+| 6. Ship | everything | Read the model card; browse the files `mt ship` writes | `generate_model_card`, the `mt ship` templates |
+
+Link straight to a step with `?step=serve`, `score`, `watch`, `gate` or `ship`. The page fits one screen on desktop and on a phone.
 
 The toolbox also has `mt init`, `mt doctor` and a multi-project dashboard. They are not in the demo; see the toolbox README.
 
@@ -43,7 +52,7 @@ uvicorn playground.api:app --port 8001
 cd web && npm install && npm run dev      # http://localhost:5174
 ```
 
-Run the tests with `pytest`. Link straight to a feature with `?tab=serve`, `score`, `drift`, `gate`, `card` or `ship`.
+Run the tests with `pytest`. 
 
 ## Layout
 

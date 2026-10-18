@@ -59,6 +59,21 @@ def register() -> dict[str, Any]:
     return {"steps": w.steps, "model": _model_view("1")}
 
 
+class BareRequest(BaseModel):
+    record: dict[str, Any]
+
+
+@app.post("/api/bare")
+def bare(req: BareRequest) -> dict[str, Any]:
+    """What the same model does with a request when nothing checks it against a contract."""
+    model_ = get_world().registry.get_model(MODEL_NAME, "production")
+    try:
+        out = model_.predict(pd.DataFrame([req.record]))
+        return {"ok": True, "prediction": str(out[0])}
+    except Exception as err:  # noqa: BLE001 - the point: it guesses or crashes
+        return {"ok": False, "error": f"{type(err).__name__}: {err}"[:160]}
+
+
 class ScoreRequest(BaseModel):
     csv: str = Field(max_length=20_000)
 

@@ -86,3 +86,14 @@ def test_a_recession_drifts_the_whole_dataset():
     r = client.post("/api/drift", json={"income_shift": -0.3, "poor_share": 0.4, "loan_scale": 1.4}).json()
     assert r["dataset_drift"] and r["drift_share"] >= 0.5
     assert r["prediction"]["drift"] and r["prediction"]["approval_cur"] < 0.3
+
+
+def test_bare_model_guesses_or_crashes_without_a_contract():
+    ok = client.post("/api/bare", json={"record": VALID}).json()
+    assert ok["ok"] and ok["prediction"] in ("approved", "declined")
+    silent = client.post("/api/bare", json={"record": {**VALID, "employment": "astronaut"}}).json()
+    assert silent["ok"]  # no error, no warning: the wrong answer is just returned
+    crash = client.post("/api/bare", json={"record": {**VALID, "income": "lots"}}).json()
+    assert not crash["ok"] and "Error" in crash["error"]
+    missing = client.post("/api/bare", json={"record": {k: v for k, v in VALID.items() if k != "age"}}).json()
+    assert not missing["ok"]
