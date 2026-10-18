@@ -1,0 +1,2 @@
+mlops-toolbox @ git+https://github.com/ammaradam/MLOps-Toolbox@eb681f2e8117b14a5cdea8ad563ff1e1c9331f0b
+fastapi>=0.115
